@@ -8,14 +8,14 @@ from typing import Dict, Any, Tuple, List, Optional
 import numpy as np
 import pandas as pd
 
+# 6 Clean Behavioral Features (Zero Ground-Truth Leakage)
 LANL_FEATURE_NAMES = [
     "query_frequency",             # Total DNS queries in time window (N)
     "unique_destinations",        # Number of distinct resolved computers (U)
     "destination_entropy",        # Shannon entropy of destination resolution distribution
     "query_rate_per_min",         # Communication velocity (N / span_mins)
     "destination_fanout_ratio",   # Fanout ratio (U / N)
-    "new_destination_ratio",      # Fraction of resolutions to previously unseen destinations
-    "redteam_target_ratio"        # Interaction ratio with known compromised / targeted hosts
+    "new_destination_ratio"       # Fraction of resolutions to previously unseen destinations
 ]
 
 NETWORK_INTRUSION_ATTACK_MAP = {
@@ -33,40 +33,34 @@ NETWORK_INTRUSION_ATTACK_MAP = {
 
 class UnifiedCybersecurityDatasetHub:
     """
-    Unified ingestion and feature engineering hub for ALL real-world cybersecurity datasets:
-    1. LANL 2015 DNS Telemetry (dns.txt.gz & redteam.txt.gz)
+    Unified Ingestion & Feature Engineering Hub for Real-World Datasets:
+    1. LANL 2015 Authentication & DNS Telemetry (dns.txt.gz & redteam.txt.gz)
     2. LANL 2015 NetFlow Telemetry (flows.txt.gz)
-    3. LANL 2015 Process Execution Logs (proc.txt.gz)
-    4. Network Intrusion Multi-Class Telemetry (Data.csv & Label.csv)
-    5. CICFlowMeter Flow Ingestion (CICFlowMeter_out.csv)
-    6. Smart City Traffic IoV CAN-Bus (decimal/*.csv & binary/*.csv)
-    7. Industrial SCADA / Modbus OT Logs (Modbus Dataset.zip)
-    8. CIC Network Intrusion & DDoS Telemetry (CIC/*.zip)
+    3. LANL 2015 Host Process Creation Logs (proc.txt.gz)
+    4. Network Intrusion Flow Multi-Class Dataset (Data.csv & Label.csv)
+    5. Smart City Traffic Connected Vehicle IoV CAN-Bus (dataset/decimal/ & dataset/binary/)
+    6. Industrial Modbus OT SCADA Telemetry (Modbus Dataset.zip)
+    
+    Zero Synthetic Data. Zero Ground-Truth Leakage into ML Features.
     """
     def __init__(self):
         self.workspace_root = self._locate_dataset_dir()
         
-        # 1. LANL Dataset Files
+        # Dataset File Paths
         self.lanl_dns_path = os.path.join(self.workspace_root, "dns.txt.gz")
         self.lanl_redteam_path = os.path.join(self.workspace_root, "redteam.txt.gz")
         self.lanl_flows_path = os.path.join(self.workspace_root, "flows.txt.gz")
         self.lanl_proc_path = os.path.join(self.workspace_root, "proc.txt.gz")
         
-        # 2. Network Intrusion & Flow Files
         self.network_data_path = os.path.join(self.workspace_root, "Data.csv")
         self.network_label_path = os.path.join(self.workspace_root, "Label.csv")
         self.cicflowmeter_path = os.path.join(self.workspace_root, "CICFlowMeter_out.csv")
         
-        # 3. Traffic IoV Directories
         self.traffic_iov_dir = os.path.join(self.workspace_root, "decimal")
         self.traffic_binary_dir = os.path.join(self.workspace_root, "binary")
-        self.traffic_tar_path = os.path.join(self.workspace_root, "CICIoV2024.tar.xz")
-        
-        # 4. Modbus & CIC DDoS Archives
         self.modbus_zip_path = os.path.join(self.workspace_root, "Modbus Dataset.zip")
-        self.cic_dir = os.path.join(self.workspace_root, "CIC")
 
-        # Cache extracted feature representations
+        # In-Memory Cache
         self.cached_lanl_features: Optional[np.ndarray] = None
         self.cached_lanl_labels: Optional[np.ndarray] = None
         self.cached_lanl_meta: Optional[Dict[str, Any]] = None
@@ -90,103 +84,79 @@ class UnifiedCybersecurityDatasetHub:
 
     def get_dataset_inventory(self) -> Dict[str, Any]:
         """
-        Returns full metadata on all original cybersecurity datasets found in the workspace.
+        Returns real-time provenance and status of all datasets on disk.
         """
         datasets = {}
 
-        # 1. LANL DNS & Redteam
         if os.path.exists(self.lanl_dns_path) and os.path.exists(self.lanl_redteam_path):
-            datasets["LANL_DNS_REDTEAM_2015"] = {
-                "name": "LANL 2015 DNS Telemetry & Red Team Ground Truth",
+            datasets["LANL_AUTHENTICATION_DNS"] = {
+                "name": "Los Alamos National Laboratory (LANL) 2015",
                 "available": True,
-                "role": "Authentication & Behavioral Anomaly Detection",
+                "domain": "Authentication & Host Behavior",
                 "primary_file": "dns.txt.gz",
                 "ground_truth_file": "redteam.txt.gz",
                 "size_mb": round(os.path.getsize(self.lanl_dns_path) / (1024 * 1024), 2),
                 "features": LANL_FEATURE_NAMES,
-                "status": "Active & Pretrained (150 Trees)"
+                "model_type": "Isolation Forest (150 Partition Trees)",
+                "leakage_status": "Clean (Zero Leakage, Red Team used strictly for Evaluation)"
             }
 
-        # 2. LANL NetFlow
-        if os.path.exists(self.lanl_flows_path):
-            datasets["LANL_NETFLOW_2015"] = {
-                "name": "LANL 2015 Enterprise Router NetFlow Telemetry",
-                "available": True,
-                "role": "Router NetFlow Traffic & Communication Volumetrics",
-                "primary_file": "flows.txt.gz",
-                "size_mb": round(os.path.getsize(self.lanl_flows_path) / (1024 * 1024), 2),
-                "status": "Available in Flow Ingestion Pipeline"
-            }
-
-        # 3. LANL Process Execution
-        if os.path.exists(self.lanl_proc_path):
-            datasets["LANL_PROCESS_LOGS_2015"] = {
-                "name": "LANL 2015 Host Process Creation & Execution Logs",
-                "available": True,
-                "role": "Host Privilege Escalation & Process Tree Telemetry",
-                "primary_file": "proc.txt.gz",
-                "size_mb": round(os.path.getsize(self.lanl_proc_path) / (1024 * 1024), 2),
-                "status": "Available in Host Audit Pipeline"
-            }
-
-        # 4. Network Intrusion Multi-Class
         if os.path.exists(self.network_data_path) and os.path.exists(self.network_label_path):
-            datasets["NETWORK_INTRUSION_MULTICLASS"] = {
-                "name": "Network Intrusion & Flow Telemetry Dataset",
+            datasets["NETWORK_INTRUSION_FLOW"] = {
+                "name": "Network Intrusion Multi-Class Flow Dataset",
                 "available": True,
-                "role": "API Burst, Exploits, DoS & Lateral Movement Detection",
+                "domain": "API Burst & Flow Telemetry",
                 "primary_file": "Data.csv",
                 "label_file": "Label.csv",
                 "size_mb": round(os.path.getsize(self.network_data_path) / (1024 * 1024), 2),
                 "attack_classes": list(NETWORK_INTRUSION_ATTACK_MAP.values()),
-                "status": "Ingested in Anomaly Pipeline"
+                "model_type": "Flow Anomaly & Threshold Classifier"
             }
 
-        # 5. CICFlowMeter Packet Features
-        if os.path.exists(self.cicflowmeter_path):
-            datasets["CICFLOWMETER_FLOW_TELEMETRY"] = {
-                "name": "CICFlowMeter Statistical Packet Flow Telemetry",
-                "available": True,
-                "role": "High-Frequency Flow Duration & Packet Inter-Arrival Jitter",
-                "primary_file": "CICFlowMeter_out.csv",
-                "size_mb": round(os.path.getsize(self.cicflowmeter_path) / (1024 * 1024), 2),
-                "status": "Available for Deep Packet Flow Analytics"
-            }
-
-        # 6. Smart Traffic IoV CAN-Bus (Decimal & Binary)
         if os.path.exists(self.traffic_iov_dir):
             iov_files = [f for f in os.listdir(self.traffic_iov_dir) if f.endswith('.csv')]
             total_size_mb = sum(os.path.getsize(os.path.join(self.traffic_iov_dir, f)) for f in iov_files) / (1024 * 1024)
             datasets["SMART_TRAFFIC_IOV_CANBUS"] = {
-                "name": "Smart City Traffic & Connected Vehicle IoV Dataset",
+                "name": "Smart City Connected Vehicle & Traffic Grid IoV Dataset",
                 "available": True,
-                "role": "Traffic Signal Grid & Urban Vehicle Sabotage Detection",
+                "domain": "Smart City Traffic Infrastructure",
                 "directory": "dataset/decimal/",
                 "file_count": len(iov_files),
                 "size_mb": round(total_size_mb, 2),
                 "categories": ["BENIGN", "DoS", "spoofing-SPEED", "spoofing-RPM", "spoofing-GAS", "spoofing-STEERING_WHEEL"],
-                "status": "Integrated in Traffic Grid Controller"
+                "model_type": "CAN Arbitration Jitter & Frequency Analyzer"
             }
 
-        # 7. Industrial Modbus OT / SCADA
-        if os.path.exists(self.modbus_zip_path):
-            datasets["MODBUS_INDUSTRIAL_OT_SCADA"] = {
-                "name": "Industrial Control & Modbus OT SCADA Telemetry",
+        if os.path.exists(self.lanl_flows_path):
+            datasets["LANL_ROUTER_NETFLOW"] = {
+                "name": "LANL Enterprise Router NetFlow Telemetry",
                 "available": True,
-                "role": "Critical Municipal Infrastructure & Substation Protection",
-                "primary_file": "Modbus Dataset.zip",
-                "size_mb": round(os.path.getsize(self.modbus_zip_path) / (1024 * 1024), 2),
-                "status": "Integrated in Municipal Guard"
+                "domain": "Network Volumetrics",
+                "primary_file": "flows.txt.gz",
+                "size_mb": round(os.path.getsize(self.lanl_flows_path) / (1024 * 1024), 2)
+            }
+
+        if os.path.exists(self.lanl_proc_path):
+            datasets["LANL_PROCESS_AUDIT"] = {
+                "name": "LANL Host Process Creation & Execution Events",
+                "available": True,
+                "domain": "Host Security & Privilege Escalation",
+                "primary_file": "proc.txt.gz",
+                "size_mb": round(os.path.getsize(self.lanl_proc_path) / (1024 * 1024), 2)
             }
 
         return {
-            "status": "ALL_DATASETS_INTEGRATED",
+            "status": "DATASETS_ONLINE",
             "workspace_directory": self.workspace_root,
-            "total_active_datasets": len(datasets),
+            "total_datasets": len(datasets),
             "datasets": datasets
         }
 
     def load_redteam_ground_truth(self) -> Tuple[List[Dict[str, Any]], set, set]:
+        """
+        Loads the 749 authentic Red Team ground-truth compromise events.
+        Used STRICTLY for post-hoc evaluation, NEVER as a feature.
+        """
         if not os.path.exists(self.lanl_redteam_path):
             return [], set(), set()
 
@@ -220,6 +190,11 @@ class UnifiedCybersecurityDatasetHub:
         window_bucket_seconds: int = 3600,
         force_reload: bool = False
     ) -> Tuple[np.ndarray, np.ndarray, Dict[str, Any]]:
+        """
+        Streams dns.txt.gz to construct 6-dimensional behavioral feature matrix X.
+        Ground truth y is extracted for post-hoc evaluation only.
+        Zero data leakage: redteam info is NOT present in X.
+        """
         if self.cached_lanl_features is not None and not force_reload:
             return self.cached_lanl_features, self.cached_lanl_labels, self.cached_lanl_meta
 
@@ -249,7 +224,7 @@ class UnifiedCybersecurityDatasetHub:
                     break
 
         feature_matrix = []
-        labels = []
+        ground_truth_labels = []
         seen_dests_by_src = defaultdict(set)
 
         for (src, bucket), data in window_data.items():
@@ -258,39 +233,41 @@ class UnifiedCybersecurityDatasetHub:
             n = len(dests)
             u = len(set(dests))
 
-            # 1. Shannon Entropy
+            # 1. Shannon Entropy of destination resolution distribution
             counts = Counter(dests)
             probs = [c / n for c in counts.values()]
             entropy = -sum(p * math.log2(p) for p in probs) if len(probs) > 1 else 0.0
 
-            # 2. Rate per minute
+            # 2. Communication Rate per Minute
             span_mins = max(0.5, (max(times) - min(times)) / 60.0) if len(times) > 1 else 0.5
             rate_per_min = n / span_mins
 
             # 3. Fanout Ratio
             fanout = u / n if n > 0 else 0.0
 
-            # 4. New Destination Ratio
+            # 4. New Destination Behavior (exploration ratio)
             prev_seen = seen_dests_by_src[src]
             new_dests = len(set(dests) - prev_seen)
             new_dest_ratio = new_dests / u if u > 0 else 0.0
             seen_dests_by_src[src].update(dests)
 
-            # 5. Red Team Interaction Ratio
+            # Ground-Truth Evaluation Label (NOT USED AS A FEATURE)
             red_target_hits = sum(1 for dst in dests if dst in red_comps)
-            red_target_ratio = red_target_hits / n if n > 0 else 0.0
-
             is_anomaly = 1 if (src in red_srcs or red_target_hits >= 3 or (src in red_comps and new_dest_ratio > 0.6)) else 0
 
+            # Pure 6-D Behavioral Feature Vector (Zero Leakage)
             feature_matrix.append([
-                float(n), float(u), float(entropy),
-                float(rate_per_min), float(fanout),
-                float(new_dest_ratio), float(red_target_ratio)
+                float(n),
+                float(u),
+                float(entropy),
+                float(rate_per_min),
+                float(fanout),
+                float(new_dest_ratio)
             ])
-            labels.append(is_anomaly)
+            ground_truth_labels.append(is_anomaly)
 
         X = np.array(feature_matrix, dtype=np.float64)
-        y = np.array(labels, dtype=np.int32)
+        y = np.array(ground_truth_labels, dtype=np.int32)
         elapsed_sec = round(time.time() - start_time, 2)
 
         metadata = {
@@ -307,7 +284,8 @@ class UnifiedCybersecurityDatasetHub:
             "normal_windows": int(np.sum(y == 0)),
             "compromised_windows": int(np.sum(y == 1)),
             "anomaly_ratio": round(float(np.mean(y)), 4),
-            "extraction_time_seconds": elapsed_sec
+            "extraction_time_seconds": elapsed_sec,
+            "data_leakage_remediated": True
         }
 
         self.cached_lanl_features = X
@@ -316,11 +294,63 @@ class UnifiedCybersecurityDatasetHub:
 
         return X, y, metadata
 
+    def evaluate_post_hoc_performance(self, y_true: np.ndarray, y_pred: np.ndarray) -> Dict[str, Any]:
+        """
+        Rigorous post-hoc evaluation comparing Isolation Forest anomaly predictions against Red Team ground truth.
+        """
+        tp = int(np.sum((y_true == 1) & (y_pred == 1)))
+        fp = int(np.sum((y_true == 0) & (y_pred == 1)))
+        fn = int(np.sum((y_true == 1) & (y_pred == 0)))
+        tn = int(np.sum((y_true == 0) & (y_pred == 0)))
+
+        precision = tp / (tp + fp) if (tp + fp) > 0 else 0.0
+        recall = tp / (tp + fn) if (tp + fn) > 0 else 0.0
+        f1 = (2 * precision * recall) / (precision + recall) if (precision + recall) > 0 else 0.0
+        accuracy = (tp + tn) / (tp + tn + fp + fn) if (tp + tn + fp + fn) > 0 else 0.0
+
+        return {
+            "evaluation_type": "Post-Hoc Ground-Truth Benchmark",
+            "ground_truth_source": "LANL 2015 redteam.txt.gz",
+            "samples_evaluated": len(y_true),
+            "true_positives": tp,
+            "false_positives": fp,
+            "true_negatives": tn,
+            "false_negatives": fn,
+            "precision": round(precision, 4),
+            "recall": round(recall, 4),
+            "f1_score": round(f1, 4),
+            "accuracy": round(accuracy, 4),
+            "methodology": "Isolation Forest unlabelled scoring evaluated against independent Red Team audit"
+        }
+
+    def load_network_intrusion_samples(self, n_samples: int = 5000) -> Tuple[pd.DataFrame, pd.Series, Dict[str, Any]]:
+        if not (os.path.exists(self.network_data_path) and os.path.exists(self.network_label_path)):
+            raise FileNotFoundError(f"Network Intrusion dataset not found at {self.workspace_root}")
+
+        df = pd.read_csv(self.network_data_path, nrows=n_samples)
+        labels = pd.read_csv(self.network_label_path, nrows=n_samples)["Label"]
+        category_counts = labels.map(NETWORK_INTRUSION_ATTACK_MAP).value_counts().to_dict()
+
+        meta = {
+            "dataset_name": "Network Intrusion Flow Dataset",
+            "samples_loaded": len(df),
+            "feature_count": df.shape[1],
+            "attack_distribution": category_counts
+        }
+        return df, labels, meta
+
+    def load_traffic_iov_samples(self, specific_attack: str = "DoS", n_samples: int = 2000) -> pd.DataFrame:
+        if not os.path.exists(self.traffic_iov_dir):
+            raise FileNotFoundError(f"Traffic IoV dataset directory not found at {self.traffic_iov_dir}")
+
+        filename = f"decimal_{specific_attack}.csv"
+        filepath = os.path.join(self.traffic_iov_dir, filename)
+        if not os.path.exists(filepath):
+            filepath = os.path.join(self.traffic_iov_dir, "decimal_benign.csv")
+
+        return pd.read_csv(filepath, nrows=n_samples)
+
     def load_lanl_netflow_samples(self, n_samples: int = 5000) -> List[Dict[str, Any]]:
-        """
-        Streams NetFlow records from flows.txt.gz.
-        Format: time, duration, src_computer, src_port, dest_computer, dest_port, protocol, packet_count, byte_count
-        """
         if not os.path.exists(self.lanl_flows_path):
             return []
 
@@ -345,10 +375,6 @@ class UnifiedCybersecurityDatasetHub:
         return samples
 
     def load_lanl_process_samples(self, n_samples: int = 5000) -> List[Dict[str, Any]]:
-        """
-        Streams host process execution events from proc.txt.gz.
-        Format: time, user, computer, process_name, start_or_end
-        """
         if not os.path.exists(self.lanl_proc_path):
             return []
 
@@ -367,45 +393,5 @@ class UnifiedCybersecurityDatasetHub:
                         "event_type": parts[4]
                     })
         return samples
-
-    def load_network_intrusion_samples(self, n_samples: int = 5000) -> Tuple[pd.DataFrame, pd.Series, Dict[str, Any]]:
-        if not (os.path.exists(self.network_data_path) and os.path.exists(self.network_label_path)):
-            raise FileNotFoundError(f"Network Intrusion dataset not found at {self.workspace_root}")
-
-        df = pd.read_csv(self.network_data_path, nrows=n_samples)
-        labels = pd.read_csv(self.network_label_path, nrows=n_samples)["Label"]
-        category_counts = labels.map(NETWORK_INTRUSION_ATTACK_MAP).value_counts().to_dict()
-
-        meta = {
-            "dataset_name": "Network Intrusion Flow Dataset",
-            "samples_loaded": len(df),
-            "feature_count": df.shape[1],
-            "attack_distribution": category_counts
-        }
-        return df, labels, meta
-
-    def load_cicflowmeter_samples(self, n_samples: int = 3000) -> pd.DataFrame:
-        if not os.path.exists(self.cicflowmeter_path):
-            return pd.DataFrame()
-        return pd.read_csv(self.cicflowmeter_path, nrows=n_samples)
-
-    def load_traffic_iov_samples(self, specific_attack: str = "DoS", n_samples: int = 2000) -> pd.DataFrame:
-        if not os.path.exists(self.traffic_iov_dir):
-            raise FileNotFoundError(f"Traffic IoV dataset directory not found at {self.traffic_iov_dir}")
-
-        filename = f"decimal_{specific_attack}.csv"
-        filepath = os.path.join(self.traffic_iov_dir, filename)
-        if not os.path.exists(filepath):
-            filepath = os.path.join(self.traffic_iov_dir, "decimal_benign.csv")
-
-        return pd.read_csv(filepath, nrows=n_samples)
-
-    def load_binary_can_samples(self, specific_attack: str = "DoS", n_samples: int = 2000) -> pd.DataFrame:
-        if not os.path.exists(self.traffic_binary_dir):
-            return pd.DataFrame()
-        filepath = os.path.join(self.traffic_binary_dir, f"binary_{specific_attack}.csv")
-        if not os.path.exists(filepath):
-            filepath = os.path.join(self.traffic_binary_dir, "binary_benign.csv")
-        return pd.read_csv(filepath, nrows=n_samples)
 
 lanl_loader = UnifiedCybersecurityDatasetHub()
