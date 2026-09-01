@@ -1,0 +1,27 @@
+# Dependencies & Build Artifacts
+node_modules/
+dist/
+.pytest_cache/
+__pycache__/
+*.pyc
+*.sqlite3-journal
+*DS_Store
+*.DS_Store
+
+# Environment Secrets
+.env
+
+# Large archives and files exceeding GitHub 100MB limit
+*.zip
+*.tar
+*.xz
+*.crdownload
+dataset/dns.txt.gz
+dataset/flows.txt.gz
+dataset/proc.txt.gz
+dataset/Data.csv
+dataset/CICFlowMeter_out.csv
+dataset/binary/
+dataset/CIC/
+securox-gov-portal-full.zip
+securox-gov-portal.zip
