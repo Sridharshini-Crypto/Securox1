@@ -2,16 +2,33 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%232563eb'><path d='M12 2L3 7v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-9-5z'/></svg>" />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%230B4EA2'><path d='M12 2L3 7v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-9-5z'/></svg>" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>SECUROX | Government Security & Critical Infrastructure Portal</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+      window.addEventListener('error', function(e) {
+        console.error('Global JS Error:', e);
+        var root = document.getElementById('root');
+        if (root && (!root.innerHTML || root.innerHTML.indexOf('Initializing') !== -1)) {
+          root.innerHTML = '<div style="min-height:100vh;background:#0B1728;color:white;display:flex;align-items:center;justify-content:center;padding:24px;font-family:sans-serif;"><div style="max-width:600px;background:#102238;border:1px solid #ef4444;border-radius:16px;padding:24px;"><h2 style="color:#f87171;margin:0 0 12px 0;">Securox Portal Diagnostics</h2><p style="color:#cbd5e1;font-size:14px;margin:0 0 16px 0;">An error occurred while mounting the portal interface:</p><pre style="background:#07111F;padding:12px;border-radius:8px;color:#fca5a5;font-size:12px;overflow:auto;white-space:pre-wrap;">' + (e.message || e.error || e) + '</pre><button onclick="localStorage.clear();location.reload();" style="margin-top:16px;background:#0B4EA2;color:white;border:none;padding:10px 18px;border-radius:8px;cursor:pointer;font-weight:bold;">Clear Cache & Reload</button></div></div>';
+        }
+      });
+    </script>
   </head>
-  <body class="bg-[#F5F7FA] dark:bg-[#0B1220] text-slate-900 dark:text-slate-100">
-    <div id="root"></div>
+  <body class="bg-[#F7F9FC] dark:bg-[#07111F] text-[#172033] dark:text-slate-100">
+    <div id="root">
+      <div style="min-height:100vh;background:#0B1728;color:#94a3b8;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:13px;gap:12px;">
+        <div style="width:36px;height:36px;border:3px solid #0B4EA2;border-top-color:#38bdf8;border-radius:50%;animation:spin 1s linear infinite;"></div>
+        <div style="font-weight:bold;color:#f8fafc;letter-spacing:0.05em;">SECUROX SOVEREIGN PORTAL</div>
+        <div style="font-size:11px;color:#64748b;">Initializing Government Digital Infrastructure Core...</div>
+      </div>
+      <style>
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+      </style>
+    </div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
-
