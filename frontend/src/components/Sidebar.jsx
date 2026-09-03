@@ -57,13 +57,6 @@ export const Sidebar = ({ activeTab, setActiveTab }) => {
       icon: BrainCircuit,
       badge: 'LANL Benchmark',
       color: 'text-teal-500'
-    },
-    {
-      id: 'datasets',
-      label: 'Dataset Intelligence',
-      icon: Terminal,
-      badge: 'Lineage',
-      color: 'text-indigo-500'
     }
   ];
 

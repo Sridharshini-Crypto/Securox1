@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { 
-  Shield, Key, User, Lock, Fingerprint, KeyRound, Globe, 
-  Laptop, AlertCircle, CheckCircle2, RefreshCw, ChevronRight, Sliders, ArrowLeft,
-  Building, Mail, UserPlus, ShieldCheck, Cpu, Smartphone
+  Shield, Key, User, Lock, KeyRound, Globe, 
+  Laptop, AlertCircle, CheckCircle2, RefreshCw, ChevronRight, ArrowLeft,
+  Building, Mail, UserPlus, ShieldCheck, Cpu, HardDrive
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
@@ -25,7 +25,6 @@ export const LoginPage = ({ onBackToLanding }) => {
   const [useExternalIp, setUseExternalIp] = useState(false);
   const [useForeignLocation, setUseForeignLocation] = useState(false);
   const [usePasskey, setUsePasskey] = useState(true);
-  const [useBiometrics, setUseBiometrics] = useState(true);
 
   // Register form state
   const [regFullName, setRegFullName] = useState('');
@@ -36,7 +35,6 @@ export const LoginPage = ({ onBackToLanding }) => {
   const [regRole, setRegRole] = useState('AUDITOR');
   const [regDeviceName, setRegDeviceName] = useState('Gov-Issued ThinkPad T14s');
   const [regPasskeyEnrolled, setRegPasskeyEnrolled] = useState(true);
-  const [regBiometricEnrolled, setRegBiometricEnrolled] = useState(true);
 
   const predefinedAccounts = [
     { username: 'admin01', role: 'SUPER_ADMIN', name: 'Dr. Sarah Connor', desc: 'Full Homeland Security & Critical Infrastructure Access' },
@@ -63,8 +61,7 @@ export const LoginPage = ({ onBackToLanding }) => {
       source_ip: useExternalIp ? '185.220.101.42' : '10.14.22.105',
       location_city: useForeignLocation ? 'Amsterdam' : 'Austin',
       location_country: useForeignLocation ? 'Netherlands' : 'USA',
-      passkey_credential: usePasskey ? 'FIDO2_SEC_ADMIN01_TOKEN' : null,
-      biometric_signature: useBiometrics ? 'BIO_FP_VERIFIED_SEC_ADMIN' : null
+      passkey_credential: usePasskey ? 'FIDO2_SEC_ADMIN01_TOKEN' : null
     };
 
     await login(payload);
@@ -89,8 +86,7 @@ export const LoginPage = ({ onBackToLanding }) => {
       role_name: regRole,
       device_name: regDeviceName,
       device_fingerprint: `DEV-OFFICIAL-${regUsername.toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`,
-      passkey_credential: regPasskeyEnrolled ? `FIDO2_SEC_KEY_${regUsername.toUpperCase()}_TOKEN` : null,
-      biometric_signature: regBiometricEnrolled ? `BIO_SIG_${regUsername.toUpperCase()}_ENROLLED` : null
+      passkey_credential: regPasskeyEnrolled ? `FIDO2_SEC_KEY_${regUsername.toUpperCase()}_TOKEN` : null
     };
 
     const res = await register(payload);
@@ -103,10 +99,10 @@ export const LoginPage = ({ onBackToLanding }) => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F5F7FA] dark:bg-[#0B1220] flex flex-col justify-between text-slate-900 dark:text-slate-100 transition-colors duration-200 font-sans">
+    <div className="min-h-screen bg-[#F7F9FC] dark:bg-[#07111F] flex flex-col justify-between text-[#172033] dark:text-slate-100 transition-colors duration-200 font-sans">
       
-      {/* Top Sovereign Government Identity Banner */}
-      <header className="border-b border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md sticky top-0 z-40">
+      {/* Top Institutional Header */}
+      <header className="border-b border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-[#07111F]/95 backdrop-blur-md sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           
           <div className="flex items-center gap-4">
@@ -121,28 +117,28 @@ export const LoginPage = ({ onBackToLanding }) => {
               </button>
             )}
 
-            <div className="h-6 w-px bg-slate-200 dark:border-slate-800 hidden sm:block"></div>
+            <div className="h-6 w-px bg-slate-200 dark:bg-slate-800 hidden sm:block"></div>
 
             <div className="flex items-center gap-3">
-              <IndiaNationalEmblem size={32} showText={false} />
+              <IndiaNationalEmblem size="sm" showText={false} />
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white">
-                    Government of India
+                  <span className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white font-mono">
+                    SECUROX OFFICER GATEWAY
                   </span>
-                  <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 font-bold">
-                    OFFICIAL ACCESS
+                  <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-blue-50 dark:bg-blue-950/60 text-[#0B4EA2] dark:text-cyan-400 border border-blue-200 dark:border-blue-800 font-bold">
+                    AUTHORIZED ACCESS
                   </span>
                 </div>
                 <p className="text-[10px] text-slate-500 dark:text-slate-400">
-                  National Critical Information Infrastructure Protection Centre (NCIIPC) &bull; CERT-In
+                  Government Digital Infrastructure &bull; NIST SP 800-207 Zero-Trust Architecture
                 </p>
               </div>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
-            <SecuroxLogo size={22} />
+            <SecuroxLogo size="sm" showSubtitle={false} />
             <button
               onClick={toggleTheme}
               className="p-2 rounded-xl border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-xs font-mono"
@@ -158,27 +154,27 @@ export const LoginPage = ({ onBackToLanding }) => {
       <main className="flex-1 flex items-center justify-center p-4 sm:p-6 lg:p-8 my-4">
         <div className="w-full max-w-4xl grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
           
-          {/* Left Context Side: Sovereign Shield & Information */}
+          {/* Left Side Context */}
           <div className="lg:col-span-5 space-y-6">
             
             <div className="space-y-2">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-600 dark:text-cyan-400 text-xs font-mono font-bold">
-                <Shield className="w-3.5 h-3.5" />
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-900/40 text-[#0B4EA2] dark:text-cyan-400 text-xs font-mono font-bold">
+                <ShieldCheck className="w-3.5 h-3.5" />
                 <span>ZERO-TRUST ADAPTIVE GATEWAY</span>
               </div>
               <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 dark:text-white">
-                Sovereign Cyber Command Access
+                Sovereign Command Access
               </h1>
               <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                Continuous 12-factor Attribute-Based Access Control (ABAC), device trust attestation, and Isolation Forest anomaly intelligence.
+                Risk-adaptive Attribute-Based Access Control (ABAC), FIDO2 device passkey attestation, and Isolation Forest anomaly intelligence.
               </p>
             </div>
 
             {/* Quick Demo Identities Autofill */}
             {authMode === 'login' && (
-              <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+              <div className="p-4 rounded-2xl bg-white dark:bg-[#0B1222] border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
                 <span className="text-[10px] font-mono uppercase tracking-wider font-bold text-slate-400 block">
-                  Quick Official Identity Presets
+                  Official Identity Profiles
                 </span>
 
                 <div className="space-y-2">
@@ -189,7 +185,7 @@ export const LoginPage = ({ onBackToLanding }) => {
                       onClick={() => handleSelectAccount(acc)}
                       className={`w-full p-2.5 rounded-xl border text-left transition-all flex items-center justify-between cursor-pointer ${
                         username === acc.username
-                          ? 'border-blue-500 dark:border-cyan-500 bg-blue-50/50 dark:bg-slate-800'
+                          ? 'border-[#0B4EA2] dark:border-cyan-500 bg-blue-50/50 dark:bg-slate-800'
                           : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 bg-slate-50/60 dark:bg-slate-950/40'
                       }`}
                     >
@@ -212,53 +208,51 @@ export const LoginPage = ({ onBackToLanding }) => {
             {/* Security Assurance Footer */}
             <div className="flex items-center gap-3 text-[11px] text-slate-500 dark:text-slate-400 font-mono">
               <ShieldCheck className="w-4 h-4 text-emerald-500 shrink-0" />
-              <span>Compliant with CERT-In Directive 2022 &amp; NIST SP 800-207 Zero-Trust Architecture.</span>
+              <span>Compliant with NIST SP 800-207 Zero-Trust Architecture.</span>
             </div>
 
           </div>
 
           {/* Right Side: Auth Card (Tabs: Login & Register) */}
-          <div className="lg:col-span-7 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-xl space-y-6">
+          <div className="lg:col-span-7 bg-white dark:bg-[#0B1222] border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-md space-y-6">
             
-            {/* Tab Controls */}
-            <div className="flex items-center p-1 rounded-2xl bg-slate-100 dark:bg-slate-800/80 text-xs font-bold font-mono">
+            {/* Tabs */}
+            <div className="flex items-center border-b border-slate-100 dark:border-slate-800 pb-3">
               <button
                 type="button"
                 onClick={() => { setAuthMode('login'); setAuthError(null); }}
-                className={`flex-1 py-2 rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                className={`pb-2 px-4 text-xs font-bold font-mono uppercase tracking-wider transition-all border-b-2 cursor-pointer ${
                   authMode === 'login'
-                    ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-cyan-400 shadow-sm'
-                    : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
+                    ? 'border-[#0B4EA2] text-[#0B4EA2] dark:border-cyan-400 dark:text-cyan-400'
+                    : 'border-transparent text-slate-400 hover:text-slate-600'
                 }`}
               >
-                <Lock className="w-3.5 h-3.5" />
-                <span>Official Login</span>
+                Official Sign In
               </button>
 
               <button
                 type="button"
                 onClick={() => { setAuthMode('register'); setAuthError(null); }}
-                className={`flex-1 py-2 rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                className={`pb-2 px-4 text-xs font-bold font-mono uppercase tracking-wider transition-all border-b-2 cursor-pointer ${
                   authMode === 'register'
-                    ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-cyan-400 shadow-sm'
-                    : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
+                    ? 'border-[#0B4EA2] text-[#0B4EA2] dark:border-cyan-400 dark:text-cyan-400'
+                    : 'border-transparent text-slate-400 hover:text-slate-600'
                 }`}
               >
-                <UserPlus className="w-3.5 h-3.5" />
-                <span>Register New Official</span>
+                New Officer Registration
               </button>
             </div>
 
-            {/* Error / Success Alerts */}
+            {/* Error or Success Alert */}
             {authError && (
-              <div className="p-3.5 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-600 dark:text-rose-400 text-xs flex items-center gap-2.5">
+              <div className="p-3.5 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/40 text-rose-700 dark:text-rose-300 text-xs font-mono flex items-center gap-2">
                 <AlertCircle className="w-4 h-4 shrink-0" />
                 <span>{authError}</span>
               </div>
             )}
 
             {regSuccessMsg && (
-              <div className="p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-xs flex items-center gap-2.5">
+              <div className="p-3.5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900/40 text-emerald-700 dark:text-emerald-300 text-xs font-mono flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 shrink-0" />
                 <span>{regSuccessMsg}</span>
               </div>
@@ -270,103 +264,83 @@ export const LoginPage = ({ onBackToLanding }) => {
                 
                 <div className="space-y-1.5">
                   <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block">
-                    Government Username / Official ID
+                    Official Identifier
                   </label>
                   <div className="relative">
-                    <User className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
+                    <User className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                     <input
                       type="text"
                       required
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
-                      placeholder="e.g. admin01"
-                      className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/60 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/40"
+                      placeholder="admin01"
+                      className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/60 text-xs font-mono text-slate-900 dark:text-white focus:outline-none focus:border-[#0B4EA2]"
                     />
                   </div>
                 </div>
 
                 <div className="space-y-1.5">
                   <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block">
-                    Security Passphrase
+                    Password / Master Token
                   </label>
                   <div className="relative">
-                    <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
+                    <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                     <input
                       type="password"
                       required
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="••••••••••••"
-                      className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/60 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/40"
+                      className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/60 text-xs font-mono text-slate-900 dark:text-white focus:outline-none focus:border-[#0B4EA2]"
                     />
                   </div>
                 </div>
 
-                {/* Cryptographic Passkey & Biometric Hardware Options */}
-                <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 space-y-2 text-xs">
-                  <span className="text-[10px] font-mono uppercase font-bold text-slate-400 block">
-                    Multi-Factor Hardware Attestation
+                {/* Adaptive Environmental Risk Switches */}
+                <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 space-y-2">
+                  <span className="text-[10px] font-mono font-bold text-slate-400 uppercase block">
+                    Zero-Trust Context Modifiers (Sandbox Testing)
                   </span>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    <label className="flex items-center gap-2 cursor-pointer p-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
-                      <input
-                        type="checkbox"
-                        checked={usePasskey}
-                        onChange={(e) => setUsePasskey(e.target.checked)}
-                        className="rounded text-blue-600 focus:ring-blue-500"
-                      />
-                      <KeyRound className="w-3.5 h-3.5 text-blue-500" />
-                      <span className="text-[11px] font-medium text-slate-700 dark:text-slate-300">FIDO2 Passkey</span>
-                    </label>
-
-                    <label className="flex items-center gap-2 cursor-pointer p-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
-                      <input
-                        type="checkbox"
-                        checked={useBiometrics}
-                        onChange={(e) => setUseBiometrics(e.target.checked)}
-                        className="rounded text-blue-600 focus:ring-blue-500"
-                      />
-                      <Fingerprint className="w-3.5 h-3.5 text-cyan-500" />
-                      <span className="text-[11px] font-medium text-slate-700 dark:text-slate-300">Biometric Sensor</span>
-                    </label>
-                  </div>
-                </div>
-
-                {/* Zero-Trust Context Simulator Toggle */}
-                <div className="border border-slate-200 dark:border-slate-800 rounded-2xl p-3 bg-slate-50/50 dark:bg-slate-950/30 text-[11px] space-y-2 font-mono">
-                  <span className="text-slate-400 text-[10px] uppercase font-bold block">
-                    Zero-Trust Environmental Context:
-                  </span>
-                  <div className="flex flex-wrap gap-3">
-                    <label className="flex items-center gap-1.5 cursor-pointer">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-mono">
+                    <label className="flex items-center gap-2 cursor-pointer">
                       <input
                         type="checkbox"
                         checked={useUntrustedDev}
                         onChange={(e) => setUseUntrustedDev(e.target.checked)}
-                        className="rounded text-rose-600"
+                        className="rounded text-[#0B4EA2]"
                       />
-                      <span className={useUntrustedDev ? 'text-rose-500 font-bold' : 'text-slate-500'}>Untrusted Device</span>
+                      <span className="text-[11px] text-slate-600 dark:text-slate-400">Unrecognized Device</span>
                     </label>
 
-                    <label className="flex items-center gap-1.5 cursor-pointer">
+                    <label className="flex items-center gap-2 cursor-pointer">
                       <input
                         type="checkbox"
                         checked={useExternalIp}
                         onChange={(e) => setUseExternalIp(e.target.checked)}
-                        className="rounded text-rose-600"
+                        className="rounded text-[#0B4EA2]"
                       />
-                      <span className={useExternalIp ? 'text-rose-500 font-bold' : 'text-slate-500'}>Tor/Foreign IP</span>
+                      <span className="text-[11px] text-slate-600 dark:text-slate-400">External Untrusted IP</span>
                     </label>
 
-                    <label className="flex items-center gap-1.5 cursor-pointer">
+                    <label className="flex items-center gap-2 cursor-pointer">
                       <input
                         type="checkbox"
                         checked={useForeignLocation}
                         onChange={(e) => setUseForeignLocation(e.target.checked)}
-                        className="rounded text-rose-600"
+                        className="rounded text-[#0B4EA2]"
                       />
-                      <span className={useForeignLocation ? 'text-rose-500 font-bold' : 'text-slate-500'}>Impossible Travel</span>
+                      <span className="text-[11px] text-slate-600 dark:text-slate-400">Impossible Travel (EU)</span>
+                    </label>
+
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={usePasskey}
+                        onChange={(e) => setUsePasskey(e.target.checked)}
+                        className="rounded text-[#0B4EA2]"
+                      />
+                      <span className="text-[11px] text-slate-600 dark:text-slate-400">FIDO2 Hardware Key</span>
                     </label>
                   </div>
                 </div>
@@ -374,7 +348,7 @@ export const LoginPage = ({ onBackToLanding }) => {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-3 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-lg shadow-blue-500/25 flex items-center justify-center gap-2 transition-all disabled:opacity-50 cursor-pointer"
+                  className="w-full py-3 rounded-xl bg-[#0B4EA2] hover:bg-[#0B4EA2]/90 text-white font-bold text-xs font-mono tracking-wider uppercase shadow-md flex items-center justify-center gap-2 transition-all disabled:opacity-50 cursor-pointer"
                 >
                   {loading ? (
                     <>
@@ -383,7 +357,7 @@ export const LoginPage = ({ onBackToLanding }) => {
                     </>
                   ) : (
                     <>
-                      <Lock className="w-4 h-4" />
+                      <KeyRound className="w-4 h-4" />
                       <span>Authenticate Session</span>
                     </>
                   )}
@@ -431,7 +405,7 @@ export const LoginPage = ({ onBackToLanding }) => {
                       value={regUsername}
                       onChange={(e) => setRegUsername(e.target.value)}
                       placeholder="e.g. vsharma_nccc"
-                      className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/60 text-xs text-slate-900 dark:text-white"
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/60 text-xs text-slate-900 dark:text-white font-mono"
                     />
                   </div>
 
@@ -443,88 +417,76 @@ export const LoginPage = ({ onBackToLanding }) => {
                       value={regPassword}
                       onChange={(e) => setRegPassword(e.target.value)}
                       placeholder="At least 8 characters"
-                      className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/60 text-xs text-slate-900 dark:text-white"
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/60 text-xs text-slate-900 dark:text-white font-mono"
                     />
                   </div>
                 </div>
 
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block">Assigned Ministry / Department</label>
+                  <input
+                    type="text"
+                    required
+                    value={regDepartment}
+                    onChange={(e) => setRegDepartment(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/60 text-xs text-slate-900 dark:text-white"
+                  />
+                </div>
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="space-y-1">
-                    <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block">Department / Ministry</label>
-                    <select
-                      value={regDepartment}
-                      onChange={(e) => setRegDepartment(e.target.value)}
-                      className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/60 text-xs text-slate-900 dark:text-white"
-                    >
-                      <option value="National Cyber Coordination Centre (NCCC)">NCCC (Homeland Security)</option>
-                      <option value="Ministry of Electronics & IT (MeitY)">MeitY (Digital India)</option>
-                      <option value="Smart City Transportation Authority">Smart City Transportation</option>
-                      <option value="Ministry of Finance (Expenditure)">Ministry of Finance</option>
-                      <option value="Municipal Governance">Municipal Governance</option>
-                    </select>
-                  </div>
-
-                  <div className="space-y-1">
-                    <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block">Security Clearance Role</label>
+                    <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block">Role &amp; Clearance</label>
                     <select
                       value={regRole}
                       onChange={(e) => setRegRole(e.target.value)}
-                      className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/60 text-xs text-slate-900 dark:text-white"
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/60 text-xs text-slate-900 dark:text-white font-mono"
                     >
-                      <option value="AUDITOR">Auditor / Inspector (Clearance Level 2)</option>
-                      <option value="MUNICIPAL_DIRECTOR">Municipal Director (Clearance Level 3)</option>
-                      <option value="TRAFFIC_CONTROLLER">Traffic Controller (Clearance Level 4)</option>
-                      <option value="FINANCE_OFFICER">Finance Officer (Clearance Level 4)</option>
-                      <option value="SUPER_ADMIN">Cyber Commander (Clearance Level 5)</option>
+                      <option value="AUDITOR">AUDITOR (Level 2)</option>
+                      <option value="MUNICIPAL_DIRECTOR">MUNICIPAL_DIRECTOR (Level 3)</option>
+                      <option value="TRAFFIC_CONTROLLER">TRAFFIC_CONTROLLER (Level 4)</option>
+                      <option value="FINANCE_OFFICER">FINANCE_OFFICER (Level 4)</option>
+                      <option value="SUPER_ADMIN">SUPER_ADMIN (Level 5)</option>
                     </select>
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block">Registered Workstation</label>
+                    <input
+                      type="text"
+                      value={regDeviceName}
+                      onChange={(e) => setRegDeviceName(e.target.value)}
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/60 text-xs text-slate-900 dark:text-white font-mono"
+                    />
                   </div>
                 </div>
 
-                {/* Device & Passkey Enrollment */}
-                <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 space-y-2 text-xs">
-                  <span className="text-[10px] font-mono uppercase font-bold text-slate-400 block">
-                    Cryptographic Device &amp; Passkey Enrollment
-                  </span>
-
-                  <div className="flex items-center gap-3">
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={regPasskeyEnrolled}
-                        onChange={(e) => setRegPasskeyEnrolled(e.target.checked)}
-                        className="rounded text-blue-600 focus:ring-blue-500"
-                      />
-                      <KeyRound className="w-3.5 h-3.5 text-blue-500" />
-                      <span className="text-[11px] font-medium text-slate-700 dark:text-slate-300">Enroll FIDO2 Hardware Passkey</span>
-                    </label>
-
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={regBiometricEnrolled}
-                        onChange={(e) => setRegBiometricEnrolled(e.target.checked)}
-                        className="rounded text-blue-600 focus:ring-blue-500"
-                      />
-                      <Fingerprint className="w-3.5 h-3.5 text-cyan-500" />
-                      <span className="text-[11px] font-medium text-slate-700 dark:text-slate-300">Enroll Biometric Profile</span>
-                    </label>
-                  </div>
+                <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-950/40 border border-slate-200 dark:border-slate-800">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={regPasskeyEnrolled}
+                      onChange={(e) => setRegPasskeyEnrolled(e.target.checked)}
+                      className="rounded text-[#0B4EA2]"
+                    />
+                    <Key className="w-3.5 h-3.5 text-[#0B4EA2] dark:text-cyan-400" />
+                    <span className="text-[11px] font-medium text-slate-700 dark:text-slate-300">Enroll FIDO2 Cryptographic Hardware Passkey</span>
+                  </label>
                 </div>
 
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-lg shadow-emerald-500/25 flex items-center justify-center gap-2 transition-all disabled:opacity-50 cursor-pointer"
+                  className="w-full py-3 rounded-xl bg-[#0B4EA2] hover:bg-[#0B4EA2]/90 text-white font-bold text-xs font-mono tracking-wider uppercase shadow-md flex items-center justify-center gap-2 transition-all disabled:opacity-50 cursor-pointer"
                 >
                   {loading ? (
                     <>
                       <RefreshCw className="w-4 h-4 animate-spin" />
-                      <span>Creating Sovereign Official Account...</span>
+                      <span>Creating Official Account...</span>
                     </>
                   ) : (
                     <>
                       <UserPlus className="w-4 h-4" />
-                      <span>Register Official Account</span>
+                      <span>Register Official Identity</span>
                     </>
                   )}
                 </button>
@@ -537,11 +499,13 @@ export const LoginPage = ({ onBackToLanding }) => {
         </div>
       </main>
 
-      {/* Sovereign Footer */}
-      <footer className="p-4 border-t border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 text-center text-xs text-slate-500 dark:text-slate-400 font-mono">
-        Securox Government Cyber Defense Platform &bull; Protected under Indian IT Act 2000 &bull; Sovereign Encryption 256-bit
+      {/* Institutional Footer */}
+      <footer className="p-4 border-t border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-[#0B1222]/80 text-center text-xs text-slate-500 dark:text-slate-400 font-mono">
+        Securox Government Digital Infrastructure Platform &bull; NIST SP 800-207 Zero-Trust Architecture
       </footer>
 
     </div>
   );
 };
+
+export default LoginPage;

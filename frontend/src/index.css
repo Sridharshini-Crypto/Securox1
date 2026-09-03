@@ -4,11 +4,11 @@
 
 @layer base {
   body {
-    @apply antialiased font-sans transition-colors duration-200;
+    @apply antialiased font-sans transition-colors duration-200 bg-[#F7F9FC] dark:bg-[#07111F] text-[#172033] dark:text-slate-100;
   }
 }
 
-/* Custom Scrollbar */
+/* Custom Institutional Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -23,22 +23,23 @@
   @apply bg-slate-400 dark:bg-slate-600;
 }
 
-/* Cyber Radar Animation */
-@keyframes radar-sweep {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+/* Subtle Telemetry Data Pulse */
+@keyframes data-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.15); opacity: 1; }
 }
 
-.animate-radar {
-  animation: radar-sweep 4s linear infinite;
+.animate-data-pulse {
+  animation: data-pulse 2.8s ease-in-out infinite;
 }
 
-@keyframes pulse-glow {
-  0%, 100% { opacity: 0.4; }
-  50% { opacity: 0.9; }
+/* Clean Telemetry Line Pulse */
+@keyframes line-flow {
+  0% { stroke-dashoffset: 24; }
+  100% { stroke-dashoffset: 0; }
 }
 
-.animate-glow {
-  animation: pulse-glow 2s ease-in-out infinite;
+.animate-line-flow {
+  stroke-dasharray: 6 6;
+  animation: line-flow 1.5s linear infinite;
 }
-
