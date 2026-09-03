@@ -29,7 +29,6 @@ async def websocket_soc_endpoint(websocket: WebSocket):
 
 @router.get("/stats")
 async def get_soc_statistics(
-    auth_data: tuple[User, UserSession] = Depends(enforce_abac_policy("AUDIT_LOGS", "READ", 1)),
     db: Session = Depends(get_db)
 ):
     total_events = db.query(SecurityEvent).count()
