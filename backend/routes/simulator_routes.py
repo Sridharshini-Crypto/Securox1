@@ -18,15 +18,17 @@ from auth import create_access_token
 router = APIRouter(prefix="/simulator", tags=["Realistic Cyber Attack & Anomaly Sandbox"])
 
 CITY_COORDINATES = {
-    "austin": (30.2672, -97.7431),
-    "amsterdam": (52.3676, 4.9041),
+    "chennai": (13.0827, 80.2707),
+    "delhi": (28.6139, 77.2090),
+    "mumbai": (19.0760, 72.8777),
+    "bengaluru": (12.9716, 77.5946),
     "frankfurt": (50.1109, 8.6821),
+    "amsterdam": (52.3676, 4.9041),
     "london": (51.5074, -0.1278),
+    "austin": (30.2672, -97.7431),
     "tokyo": (35.6762, 139.6503),
     "moscow": (55.7558, 37.6173),
     "beijing": (39.9042, 116.4074),
-    "dallas": (32.7767, -96.7970),
-    "houston": (29.7604, -95.3698),
     "new york": (40.7128, -74.0060)
 }
 

@@ -119,21 +119,25 @@ async def get_security_events(
             "id": e.id,
             "event_id": e.event_id,
             "event_type": e.event_type,
+            "user": e.user_id,
             "user_id": e.user_id,
             "role": e.role or "SYSTEM",
+            "device": e.device_id or "UNKNOWN",
             "device_id": e.device_id or "DEV-UNKNOWN",
             "source_ip": e.source_ip,
             "location": e.location or "Austin, USA (HQ)",
+            "action": e.endpoint.replace("/api/", "").replace("/", "_") if e.endpoint else "portal_access",
             "endpoint": e.endpoint or "/api/gateway",
             "timestamp": e.timestamp.isoformat() if e.timestamp else datetime.now(timezone.utc).isoformat(),
             "anomaly_score": round(e.anomaly_score, 3),
-            "severity": e.severity,
+            "severity": int(round(e.anomaly_score * 100)) if e.anomaly_score else 85,
+            "severity_level": e.severity,
             "evidence": evidence_list,
             "mitigation_action": e.mitigation_action,
             "securox_forwarded": e.securox_forwarded,
             "is_simulated": is_sim,
             "origin_badge": "SIMULATED" if is_sim else "LIVE",
-            "model_type": "Isolation Forest (LANL 7-D)"
+            "model_type": "Isolation Forest (LANL 6-D Clean)"
         })
 
     return {
