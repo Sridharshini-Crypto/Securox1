@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ThemeProvider, useTheme } from './context/ThemeContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { SocketProvider } from './context/SocketContext';
+import { ErrorBoundary } from './components/ErrorBoundary';
 
 import { Navbar } from './components/Navbar';
 import { Sidebar } from './components/Sidebar';
@@ -17,6 +18,7 @@ import { PaymentPortalPage } from './pages/PaymentPortalPage';
 import { UserManagementPage } from './pages/UserManagementPage';
 import { SecurityLogsPage } from './pages/SecurityLogsPage';
 import { MlAnomalyPage } from './pages/MlAnomalyPage';
+import { DatasetIntelligencePage } from './pages/DatasetIntelligencePage';
 
 const MainLayout = () => {
   const { isAuthenticated } = useAuth();
@@ -59,6 +61,7 @@ const MainLayout = () => {
           {activeTab === 'users' && <UserManagementPage />}
           {activeTab === 'logs' && <SecurityLogsPage />}
           {activeTab === 'ml' && <MlAnomalyPage />}
+          {activeTab === 'datasets' && <DatasetIntelligencePage />}
         </main>
 
       </div>
@@ -76,13 +79,15 @@ const MainLayout = () => {
 
 export function App() {
   return (
-    <ThemeProvider>
-      <AuthProvider>
-        <SocketProvider>
-          <MainLayout />
-        </SocketProvider>
-      </AuthProvider>
-    </ThemeProvider>
+    <ErrorBoundary>
+      <ThemeProvider>
+        <AuthProvider>
+          <SocketProvider>
+            <MainLayout />
+          </SocketProvider>
+        </AuthProvider>
+      </ThemeProvider>
+    </ErrorBoundary>
   );
 }
 

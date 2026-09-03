@@ -11,7 +11,6 @@ import { IndiaNationalEmblem } from '../components/IndiaNationalEmblem';
 import { SecuroxLogo } from '../components/SecuroxLogo';
 import { useTheme } from '../context/ThemeContext';
 import axios from 'axios';
-import { api } from '../context/AuthContext';
 
 export const LandingPage = ({ onEnterLogin, onEnterRegister }) => {
   const { isDark, toggleTheme } = useTheme();
@@ -31,7 +30,6 @@ export const LandingPage = ({ onEnterLogin, onEnterRegister }) => {
   const [infraList, setInfraList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('platform'); // 'platform' | 'initiatives' | 'infrastructure' | 'intelligence' | 'research'
-  const [activeTab, setActiveTab] = useState('platform');
 
   // Fetch real backend health & infrastructure data
   useEffect(() => {
@@ -40,8 +38,6 @@ export const LandingPage = ({ onEnterLogin, onEnterRegister }) => {
         const [healthRes, infraRes] = await Promise.all([
           axios.get('/api/health').catch(() => null),
           axios.get('/api/infrastructure/status').catch(() => null)
-          api.get('/health').catch(() => null),
-          api.get('/infrastructure/status').catch(() => null)
         ]);
 
         if (healthRes?.data) {
